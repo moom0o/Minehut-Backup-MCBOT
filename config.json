@@ -1,0 +1,8 @@
+{
+    "username": "hackme@trent.tk",
+    "password": "bruh",
+    "version": "1.12.2",
+    "joinmessage": "/join SERVERNAME",
+    "waittime": "5000",
+    "debug_mode": "false"
+}
