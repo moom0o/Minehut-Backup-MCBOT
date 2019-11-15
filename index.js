@@ -15,19 +15,7 @@ bot.on('login', () => {
   }
       bot.chat(config.joinmessage); 
       console.log(`[INFO] running ${config.joinmessage} in chat. (joining server)`)
-    setTimeout(function(){
-       bot.chat("/dl world world")
-       console.log(`[INFO] running "/dl world world". This may take a few minutes.`)
-       setTimeout(function(){
-       bot.chat("/dl world world_the_end")
-       console.log(`[INFO] running "/dl world world_the_end". This may take a few minutes.`)
-       setTimeout(function(){
-        bot.chat("/dl world world_nether")
-        console.log(`[INFO] running "/dl world world_nether". This may take a few minutes.`)
-       }, 60000);
-      }, 60000);
 
-      }, config.waittime);
 });
 bot.on('message', msg => { 
   if(config.debug_mode == "true"){
@@ -39,9 +27,47 @@ bot.on('message', msg => {
       console.log(`[INFO] world successfully downloaded. download it at ${link} `)
       return
     });
+    bot.chatAddPattern(/^Your requested server is starting up! You will be sent to it automatically.$/, 'start', 'start message')
+    bot.on('start', (link, user, reason, rawMessage, matches) => {
+      console.log(`[INFO] Server starting up. `)
+      return
+    });
+    bot.chatAddPattern(/^Sending you to ([^ ]*)!$/, 'send', 'send message')
+    bot.on('send', (link, user, reason, rawMessage, matches) => {
+      console.log(`[INFO] Sent to ${link} `)
+      setTimeout(function(){
+        bot.chat("/dl world world")
+        console.log(`[INFO] running "/dl world world". This may take a few minutes.`)
+        //setTimeout(function(){
+        bot.chat("/dl world world_the_end")
+        console.log(`[INFO] running "/dl world world_the_end". This may take a few minutes.`)
+        //setTimeout(function(){
+         bot.chat("/dl world world_nether")
+         console.log(`[INFO] running "/dl world world_nether". This may take a few minutes.`)
+        //}, 60000);
+       //}, 60000);
+ 
+       }, config.waittime);
+      return
+    });
     bot.chatAddPattern(/^Failed to upload file.$/, 'fail', 'fail message')
     bot.on('fail', (link) => {
       console.log("[ERROR] Failed to upload file.")
+    });
+    bot.chatAddPattern(/^Outdated client! Please use ([^ ]*)$/, 'protocol', 'protocol message')
+    bot.on('protocol', (link) => {
+      console.log("[ERROR] Make sure you have ProtocolSupport installed as mineflayer only supports 1.12.2- (Server is requiring a higher version.)")
+      process.exit(1)
+    });
+    bot.chatAddPattern(/^You are already connected to this server!$/, 'already_connected', 'already_connected message')
+    bot.on('already_connected', (link) => {
+      console.log(`[ERROR] Make sure you have ProtocolSupport installed as mineflayer only supports 1.12.2- or make sure the bot is whitelisted as the server is not letting the bot join your playerserver. (Server has prevented bot from connected "You are already connected to this Server")`)
+      process.exit(1)
+    });
+    bot.chatAddPattern(/^Could not connect to a default or fallback server, please try again later: ([^ ]*)$/, 'cantconnect', 'cantconnect message')
+    bot.on('cantconnect', (link) => {
+      console.log(`[ERROR] Could not connect to a default or fallback server (try again, The server probably just shutdown.)`)
+      process.exit(1)
     });
 function bindEvents(bot) {
 
